@@ -4,6 +4,7 @@ export interface Experience {
   title: string;
   location?: string;
   description?: string;
+  logo?: string;
 }
 
 export interface Education {
@@ -12,6 +13,8 @@ export interface Education {
   degree: string;
   location?: string;
   description?: string;
+  logo?: string;
+  honors?: string;
 }
 
 export interface Skill {
@@ -42,4 +45,12 @@ export function isSkill(element: Skill | Publication): element is Skill {
 
 export function isPublication(element: Skill | Publication): element is Publication {
   return 'authors' in element;
+}
+
+export interface SoftwareContribution {
+  title: string;
+  repoUrl: string;
+  role: string; // e.g., "Maintainer", "Core Contributor"
+  description: string;
+  highlights: string[];
 }

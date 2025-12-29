@@ -1,0 +1,53 @@
+---
+import { renderMathInText } from '@/lib/renderMath';
+const { pub, MY_NAME } = Astro.props;
+
+const displayAuthors = pub.authors.replace(
+  MY_NAME,
+  `<span class="font-bold underline text-base-content">${MY_NAME}</span>`
+);
+
+const getDoiLabel = (pub) => {
+  if (pub.doi) return pub.doi;
+  if (pub.link && pub.link.includes('doi.org/')) return pub.link.split('doi.org/')[1];
+  return "Link";
+};
+---
+
+<li class="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 text-sm leading-relaxed pl-4 border-l-2 border-transparent hover:border-primary/30 transition-colors py-1">
+  <div class="md:col-span-10">
+    <span set:html={displayAuthors} />
+    <span> ({pub.year}).</span>
+    <span class="font-semibold text-base-content" set:html={renderMathInText(pub.title) + "."} />
+    
+    {/* Only show journal/metadata if it's not a submitted paper without a venue yet */}
+    {pub.journal && (
+      <span class="italic text-base-content/80"> {pub.journal}</span>
+    )}{pub.volume && <span>, {pub.volume}</span>}{pub.number && <span>({pub.number})</span>}{pub.pages && <span>, {pub.pages}</span>}.
+    
+    <div class="mt-1 flex gap-3 text-[10px] uppercase tracking-widest font-bold">
+    {pub.link && (
+        <a href={pub.link} target="_blank" class="text-primary hover:text-accent flex items-center gap-1">
+        {pub.doi ? (
+            <>
+            <span class="opacity-50 font-normal capitalize">DOI:</span> {pub.doi}
+            </>
+        ) : (
+            <>
+            <span class="opacity-50 font-normal capitalize">Link:</span> {new URL(pub.link).hostname.replace('www.', '')}
+            </>
+        )}
+        </a>
+    )}
+    </div>
+  </div>
+
+  {/* Desktop Badge */}
+  <div class="md:col-span-2 flex md:justify-end items-start pt-1">
+    {pub.highlight && (
+      <a href={pub.highlight} target="_blank" class="text-[10px] bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all text-center leading-tight">
+        {pub.highlightLabel}
+      </a>
+    )}
+  </div>
+</li>

@@ -1,7 +1,17 @@
 ---
 import Layout from '@/layouts/Layout.astro'
-import { experiences, education, skills, publications } from '../data/cv'
+import { experiences, education, skills, softwareContributions, presentations, reviewService, awards, teaching } from '../data/cv'
 import CvTimeline from '@/components/ui/CvTimeline.astro'
+import SoftwareList from '@/components/ui/SoftwareList.astro';
+import PresentationList from '@/components/ui/PresentationList.astro';
+import ReviewList from '@/components/ui/ReviewList.astro';
+import DownloadCV from '@/components/ui/DownloadCV.astro';
+import AwardList from '@/components/ui/AwardList.astro';
+
+import { getBibPublications } from '../lib/bibUtils.ts';
+
+// Path to your bib file (e.g., in src/content/my_papers.bib)
+const publications = getBibPublications('./src/content/my_papers.bib');
 
 import type { Experience, Education, Publication } from '../types/cv'
 import List from '@/components/ui/List.astro'
@@ -43,16 +53,35 @@ if (publications.length > 0) {
 		return orderElement(a, b)
 	})
 }
+
+// Helper to map teaching data to timeline expectations if keys differ
+const teachingForTimeline = teaching.map(t => ({
+  time: t.date,
+  title: t.title,
+  school: t.institution, // Maps 'institution' to 'school' for the component
+  location: t.course,    // Uses the course name in the location slot
+  description: t.description,
+  logo: t.logo,
+}));
 ---
 
 <Layout>
+	<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-base-content/10 pb-8">
+	<div>
+		<h1 class="text-3xl font-black">Curriculum Vitae</h1>
+		<p class="text-base-content/60 mt-1">Last updated: December 2025</p>
+	</div>
+	
+	<DownloadCV href="/CV.pdf" fileName="CV.pdf" />
+	</div>
+
 	{
 		orderedEducations.length > 0 && (
 			<section class='mb-12'>
 				<h2 class='text-2xl font-bold mb-6 border-b pb-2'>
 					Education
 				</h2>
-				<CvTimeline elements={orderedEducations} colored={true} />
+				<CvTimeline elements={orderedEducations} colored={false} />
 			</section>
 		)
 	}
@@ -61,9 +90,9 @@ if (publications.length > 0) {
 		orderedExperiences.length > 0 && (
 			<section class='mb-12'>
 				<h2 class='text-2xl font-bold mb-6 border-b pb-2'>
-					Experiences
+					Experience
 				</h2>
-				<CvTimeline elements={orderedExperiences} colored={true} />
+				<CvTimeline elements={orderedExperiences} colored={false} />
 			</section>
 		)
 	}
@@ -72,18 +101,38 @@ if (publications.length > 0) {
 		orderedPublications.length > 0 && (
 			<section class='mb-12'>
 				<h2 class='text-2xl font-bold mb-6 border-b pb-2'>
-					Last publications
+					Publications
 				</h2>
 				<PublicationsList elements={orderedPublications}/>
 			</section>
 		)
 	}
 
-	{
-		skills.length > 0 && (
-			<section class='mb-12'>
-				<List listTitle='Skills' listItems={skills}/>
-			</section>
-		)
-	}
+	<section class="mb-12">
+		<h2 class="text-2xl font-bold mb-6 border-b pb-2">Presentations</h2>
+		<PresentationList items={presentations} />
+	</section>
+
+	<section class="mb-12">
+		<h2 class="text-2xl font-bold mb-6 border-b pb-2">Select open source software contributions</h2>
+		<SoftwareList contributions={softwareContributions} />
+	</section>
+
+	<section class="mb-12">
+		<h2 class="text-2xl font-bold mb-6 border-b pb-2">Teaching experience</h2>
+		<CvTimeline elements={teachingForTimeline} colored={false} />
+	</section>
+
+	<section class="mb-12">
+		<h2 class="text-2xl font-bold mb-6 border-b pb-2">Reviewing</h2>
+		<p class="text-sm text-base-content/60 mb-4">
+			Peer-reviewed manuscripts for:
+		</p>
+		<ReviewList journals={reviewService} />
+	</section>
+
+	<section class="mb-12">
+		<h2 class="text-2xl font-bold mb-6 border-b pb-2">Select honors and awards</h2>
+		<AwardList items={awards} />
+	</section>
 </Layout>

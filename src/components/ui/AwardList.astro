@@ -1,0 +1,25 @@
+---
+const { items } = Astro.props;
+---
+
+<ul class="space-y-4">
+  {items.map((award) => (
+    <li class="grid grid-cols-1 md:grid-cols-12 gap-2 text-sm group border-l-2 border-transparent hover:border-primary/30 pl-4 transition-colors">
+      
+      {/* Left Side: Award Details (10 cols) */}
+      <div class="md:col-span-10 leading-tight">
+        <span class="font-bold text-base-content group-hover:text-primary transition-colors">
+          {award.title}
+        </span>
+        <span class="text-base-content/60 italic"> — {award.organization}</span>
+      </div>
+
+      {/* Right Side: Harmonized Year Badge (2 cols) */}
+      <div class="md:col-span-2 flex md:justify-end items-start">
+        <span class="text-[10px] font-bold uppercase tracking-widest text-primary/80 bg-primary/5 border border-primary/20 px-2.5 py-0.5 rounded-full leading-tight whitespace-nowrap">
+          {award.year}
+        </span>
+      </div>
+    </li>
+  ))}
+</ul>
