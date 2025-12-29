@@ -1,44 +1,55 @@
 ---
-import { isSkill } from '@/types/cv';
-import type { Skill, Publication } from '@/types/cv';
-import { highlightAuthor } from '@/lib/utils'
+import PubEntry from './PubEntry.astro';
 
-interface Props {
-	elements: (Skill | Publication)[]
-}
+const { elements } = Astro.props;
+const MY_NAME = "Clark, S. K."; // Adjust to match your formatted style
 
-const { elements } = Astro.props
+// 1. Filtering Logic
+const submitted = elements.filter(e => e.type === 'unpublished');
+const journals = elements.filter(e => e.type === 'article');
+const conferences = elements.filter(e => e.type === 'inproceedings' || e.type === 'proceedings');
+
+// 2. Grouping Helper
+const groupByYear = (items) => {
+  return items.reduce((groups, item) => {
+    const year = item.year || "Under Review";
+    if (!groups[year]) groups[year] = [];
+    groups[year].push(item);
+    return groups;
+  }, {});
+};
+
+const sections = [
+  { title: "Submitted Articles & Preprints", data: groupByYear(submitted) },
+  { title: "Journal Articles", data: groupByYear(journals) },
+  { title: "Conference Proceedings", data: groupByYear(conferences) }
+];
 ---
-<ul class='space-y-8'>
-  {elements.map((element, index) => (
-    <li class='group'>
-      { isSkill(element)
-        ? <>
-        <h3 class='text-lg font-bold mb-2'>{element.title}</h3>
-        <p>{element.description}</p>
-        </> : <>
-      <a
-        href={element.link as string}
-        class='block hover:text-accent transition-colors duration-200'
-        target='_blank'
-      >
-        <h3 class='text-lg font-bold mb-2'>{element.title}</h3>
-      </a>
-      <p class='text-base mb-2'>
-        <span class='font-medium'>Authors:</span>{' '}
-        <span
-          set:html={highlightAuthor(element.authors as string)}
-        />
-      </p>
-      <p class='text-sm mb-3'>
-        <span class='italic'>{element.journal}</span> •{' '}
-        {element.time}
-      </p>
-      <p>{element.abstract}</p>
-      </>
-    }
-    {/* Uncomment this line to add a small border bottom for each element
-    {index !== elements.length -1 && <hr class="mt-6 border-primary/40" />}  */}
-    </li>
+
+<div class="space-y-5">
+  {sections.map(section => (
+    Object.keys(section.data).length > 0 && (
+      <section>
+        <h2 class="text-md font-black mb-8 border-b-2 border-primary w-fit uppercase tracking-wider">
+          {section.title}
+        </h2>
+        
+        <div class="space-y-5">
+          {Object.keys(section.data).sort((a, b) => b.localeCompare(a)).map(year => (
+            <div>
+              <div class="flex items-center gap-4 mb-4">
+                <h2 class="text-med font-bold text-primary/80">{year}</h2>
+                <div class="h-[1px] flex-1 bg-base-content/5"></div>
+              </div>
+              <ul class="space-y-2">
+                {section.data[year].map(pub => (
+                  <PubEntry pub={pub} MY_NAME={MY_NAME} />
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
   ))}
-</ul>
+</div>

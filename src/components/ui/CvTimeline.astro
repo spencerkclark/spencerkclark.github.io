@@ -1,4 +1,6 @@
 ---
+import { marked } from 'marked';
+
 import { isExperience } from '@/types/cv';
 import type { Experience, Education } from '@/types/cv';
 
@@ -10,36 +12,80 @@ interface Props {
 const { elements, colored } = Astro.props
 ---
 
-<ul
-	class='timeline timeline-snap-icon max-md:timeline-compact timeline-vertical'
->
+<ul class='timeline timeline-compact timeline-vertical ml-4'>
 	{
 		elements.map((element, index) => (
-			<li>
+			<li class="min-h-[100px]">
+				{/* Top line connecting dots */}
+				<hr class:list={[{ 'bg-primary-content': colored }]} />
+				
 				<div class='timeline-middle'>
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						viewBox='0 0 20 20'
-						fill='currentColor'
-            class:list={[{ 'text-accent': colored }, 'h-5 w-5']}
-					>
-						<path
-							fill-rule='evenodd'
-							d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z'
-							clip-rule='evenodd'
-						/>
-					</svg>
+					{element.logo ? (
+						<div class="w-20 h-20 rounded-full border-2 border-base-300 bg-white overflow-hidden flex items-center justify-center p-1 shadow-sm z-10">
+							<img 
+								src={element.logo} 
+								alt={`${isExperience(element) ? element.company : element.school} logo`} 
+								class="max-w-full max-h-full object-contain"
+							/>
+						</div>
+					) : (
+						<div class="bg-base-100 p-1">
+							<svg
+								xmlns='http://www.w3.org/2000/svg'
+								viewBox='0 0 20 20'
+								fill='currentColor'
+								class:list={[{ 'text-primary': colored }, 'h-5 w-5']}
+							>
+								<path
+									fill-rule='evenodd'
+									d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z'
+									clip-rule='evenodd'
+								/>
+							</svg>
+						</div>
+					)}
 				</div>
-				<div
-					class={`${index % 2 === 0 ? 'timeline-start' : 'timeline-end'} mb-10 md:text-end`}
-				>
-					<time class='font-mono italic'>{element.time}</time>
-					<div class='text-lg font-black'>{isExperience(element) ? element.title : element.degree}</div>
-					<div>{element.description}</div>
-					<div>{isExperience(element) ? element.company : element.school}</div>
-					<div>{element.location}</div>
+
+				{/* Changed to always use timeline-end for left-aligned text */}
+				<div class="timeline-end ps-6 py-6 w-full">
+					<div class="flex flex-col md:flex-row md:justify-between md:items-baseline gap-2 mb-1">
+						<div class='text-lg font-black leading-tight text-base-content'>
+							{isExperience(element) ? element.title : element.degree}
+						</div>
+						
+						{/* Harmonized Date Badge */}
+						<time class="text-[10px] font-bold uppercase tracking-widest text-primary/80 bg-primary/5 border border-primary/20 px-2.5 py-0.5 rounded-full leading-tight whitespace-nowrap">
+							{element.time}
+						</time>
+					</div>
+
+					<div class="font-bold text-primary flex items-center gap-2">
+						{isExperience(element) ? element.company : element.school}
+						<span class="text-xs font-normal italic opacity-60">— {element.location}</span>
+					</div>
+
+					{/* Simplified Honors Line */}
+					{!isExperience(element) && element.honors && (
+					<div class="text-[13px] font-medium text-base-content/70 mt-0.5 italic">
+						{element.honors}
+					</div>
+					)}
+
+					<div class="text-pretty text-sm opacity-90 mt-3 max-w-3xl">
+						{Array.isArray(element.description) ? (
+							<ul class="list-disc list-outside ms-4 space-y-1.5">
+								{element.description.map((bullet) => (
+									<li class="leading-relaxed prose-inline"><span set:html={marked.parseInline(bullet)} /></li>
+								))}
+							</ul>
+						) : (
+							<p class="leading-relaxed prose-inline"><span set:html={marked.parseInline(element.description)} /></p>
+						)}
+					</div>
 				</div>
-        <hr class:list={[{ 'bg-accent': colored }]} />
+
+				{/* Bottom line connecting dots */}
+				<hr class:list={[{ 'bg-primary-content': colored }]} />
 			</li>
 		))
 	}

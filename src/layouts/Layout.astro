@@ -63,7 +63,6 @@ const {
 							</label>
 						</div>
 						<div class='navbar-center lg:hidden text-lg font-black'>
-							{profile.title}
 							{profile.fullName}
 						</div>
 						<div class='navbar-end'>
@@ -102,4 +101,16 @@ const {
 		width: 100%;
 		height: 100%;
 	}
+</style>
+
+<style is:global>
+/* 1. Styling inline code snippets */
+  .prose-inline code {
+    @apply bg-base-content/5 text-primary px-1.5 py-0.5 rounded text-[0.9em] font-mono;
+  }
+
+  /* 2. Styling Markdown links specifically */
+  .prose-inline a {
+    @apply text-primary font-medium underline underline-offset-4 decoration-primary/30 hover:decoration-primary transition-all;
+  }
 </style>
