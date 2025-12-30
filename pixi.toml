@@ -1,0 +1,13 @@
+[workspace]
+authors = ["Spencer Clark <spencerkclark@gmail.com>"]
+channels = ["conda-forge"]
+name = "spencerkclark.github.io"
+platforms = ["osx-arm64"]
+version = "0.1.0"
+
+[tasks]
+install = "npm install"
+serve = { cmd = "npm run dev", depends-on = ["install"] }
+
+[dependencies]
+nodejs = ">=25.2.1,<25.3"
